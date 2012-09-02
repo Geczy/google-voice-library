@@ -163,7 +163,6 @@ class GoogleVoice
 		$results = array(
 			'unread' => $data->unreadCounts->sms,
 			'total'  => $data->totalSize,
-			'results'=> $data->resultsPerPage,
 		);
 
 		$contacts = $data->contacts->contactPhoneMap;
