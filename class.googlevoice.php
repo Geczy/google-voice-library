@@ -166,6 +166,8 @@ class GoogleVoice
 			'results'=> $data->resultsPerPage,
 		);
 
+		$contacts = $data->contacts->contactPhoneMap;
+
 		foreach($data->messageList as $thread)
 		{
 
@@ -174,11 +176,13 @@ class GoogleVoice
 				continue;
 
 			/* Extract just the information that's useful. */
+			$number = $thread->phoneNumber;
 			$results[] = array(
-				'id'  => $thread->id,
-				'from'=> $thread->displayNumber,
-				'text'=> $thread->messageText,
-				'date'=> $thread->displayStartDateTime,
+				'id'    => $thread->id,
+				'from'  => $contacts->$number->name,
+				'number'=> $thread->displayNumber,
+				'text'  => $thread->messageText,
+				'date'  => $thread->displayStartDateTime,
 			);
 
 		 }
