@@ -37,8 +37,7 @@ class GoogleVoice
 		$this->getRnrSe();
 	}
 
-
-	private function getPage($URL,$param=""){
+	private function getPage($URL, $param=''){
 
 
 		$ch = curl_init($URL);
@@ -87,8 +86,6 @@ class GoogleVoice
 		$html = $this->getPage($this->inboxURL);
 		$this->rnrSee = $this->match('!<input.*?name="_rnr_se".*?value="(.*?)"!ms', $html, 1);
 	}
-
-
 
 	public function sendSMS($to_phonenumber, $smstxt)
 	{
@@ -151,33 +148,42 @@ class GoogleVoice
 
 	}
 
-   //work in progress
 	public function getSMS($onlyNew = false, $page = 1)
 	{
 
-		$json = $this->getPage("https://www.google.com/voice/b/0/request/messages?page=$page");
+		/* @todo: Set this at execution instead of in this function. */
+		$url = 'https://www.google.com/voice/b/0/request/messages?';
 
-		echo $json;
+		$params = array('page' => $page);
+		$smsParams = http_build_query($params);
+		$json = $this->getPage($url.$smsParams);
 
 		$data = json_decode($json);
+
+		/* @todo: Put these into one array. */
 		$this->unreadSMSCount = $data->unreadCounts->sms;
 		$this->totalSize = $data->totalSize;
 		$this->resultsPerPage = $data->resultsPerPage;
 
 		$results = array();
-		foreach($data->messageList as $key => $thread)
+		foreach($data->messageList as $thread)
 		{
 
-			if($onlyNew == true && $thread->isRead != 0)
-			{
+			/* This message is already read, so skip */
+			if($onlyNew && !empty($thread->isRead))
 				continue;
-			}
 
-			//echo "<br>Key : $key <br>";
-			//print_r($thread);
-			//echo "<br><br>";
+			/* Extract just the information that's useful. */
+			$results[] = array(
+				'from' => $thread->displayNumber,
+				'text' => $thread->messageText,
+				'date' => $thread->displayStartDateTime,
+			);
 
 		 }
+
+		 return $results;
+
 	}
 
 	public function getNewSMS()
@@ -256,5 +262,5 @@ class GoogleVoice
 	{
 		return preg_match($regex, $str, $match) == 1 ? $match[$out_ary] : false;
 	}
+
 }
-?>
