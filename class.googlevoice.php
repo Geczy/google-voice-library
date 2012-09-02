@@ -45,7 +45,7 @@ class GoogleVoice
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0'));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$this->login_auth}", 'User-Agent: Mozilla/5.0'));
 		curl_setopt($ch, CURLOPT_REFERER, $this->lastURL);
 
 		if(!empty($param)){
@@ -78,7 +78,7 @@ class GoogleVoice
 
 			$loginParam = http_build_query($params);
 			$html = $this->getPage($this->loginURL, $loginParam);
-			$this->login_auth = $this->match('/Auth=([A-z0-9_-]+)/', $html, 1);
+			$this->login_auth = strstr($html, 'Auth=');
 
 		}
 
