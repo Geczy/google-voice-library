@@ -151,7 +151,7 @@ class GoogleVoice
 
 	}
 
-   //work in porgress
+   //work in progress
 	public function getSMS($onlyNew = false, $page = 1)
 	{
 
@@ -183,11 +183,11 @@ class GoogleVoice
 	public function getNewSMS()
 	{
 
-		$htmlSorce = $this->getPage($this->unreadURL);
+		$htmlSource = $this->getPage($this->unreadURL);
 
 		$html = new simple_html_dom();
 
-		$html->load($htmlSorce);
+		$html->load($htmlSource);
 
 		$newcalls = array();
 
@@ -243,8 +243,6 @@ class GoogleVoice
 
 				//$thiscall["replay_url"] = $replay_url;
 				//$thiscall["Mark_as_read_url"] = $Mark_as_read_url;
-
-
 
 				$newcalls[] = $thiscall;
 			}
