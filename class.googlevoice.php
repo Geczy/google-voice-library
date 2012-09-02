@@ -37,27 +37,30 @@ class GoogleVoice
 		$this->getRnrSe();
 	}
 
-	private function getPage($URL, $param=''){
+	private function getPage($url, $param = '')
+	{
 
+		$ch = curl_init($url);
 
-		$ch = curl_init($URL);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$headers = array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0');
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0'));
 		curl_setopt($ch, CURLOPT_REFERER, $this->lastURL);
-		if($param != ""){
+
+		if(!empty($param)){
 			curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $param);
 		}
-		$html = curl_exec($ch);
 
+		$response = curl_exec($ch);
 		$this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+
 		curl_close($ch);
 
-		return $html;
+		return $response;
+
 	}
 
 	private function getLoginAuth()
