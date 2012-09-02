@@ -13,128 +13,133 @@ class GoogleVoice
     public $password;
     public $status;
     private $lastURL;
-    private $login_auth;
+    private $login_auth = "";
+    private $rnrSe = "";
+    
     private $inboxURL = 'https://www.google.com/voice/b/0/m/';
     private $loginURL = 'https://www.google.com/accounts/ClientLogin';
     private $smsURL = 'https://www.google.com/voice/m/sendsms';
-    private $UnreadURL = 'https://www.google.com/voice/m/i/unread';
-   	private $Mark_Read_URL = 'https://www.google.com/voice/m/mark?';
-	private $Archive_URL = 'https://www.google.com/voice/m/archive?';
+    private $unreadURL = 'https://www.google.com/voice/m/i/unread';
+   	private $markReadURL = 'https://www.google.com/voice/m/mark?';
+	private $archiveURL = 'https://www.google.com/voice/m/archive?';
+	private $deleteURL = 'https://www.google.com/voice/b/0/inbox/deleteMessages/';
+    
+    
+   	public $unreadSMSCount;
+    public $totalSize;
+    public $resultsPerPage;
+    
     public function __construct($username, $password)
     {
         $this->username = $username;
         $this->password = $password;
-    }
-
-    public function getLoginAuth()
-    {
-        $login_param = "accountType=GOOGLE&Email={$this->username}&Passwd={$this->password}&service=grandcentral&source=com.lostleon.GoogleVoiceTool";
-        $ch = curl_init($this->loginURL);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_2_1 like Mac OS X; en-us) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5H11 Safari/525.20");
-        curl_setopt($ch, CURLOPT_REFERER, $this->lastURL);
-        curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $login_param);
-        $html = curl_exec($ch);
-        $this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-        curl_close($ch);
-        $this->login_auth = $this->match('/Auth=([A-z0-9_-]+)/', $html, 1);
-        return $this->login_auth;
-    }
-
-    public function get_rnr_se()
-    {
         $this->getLoginAuth();
-        $ch = curl_init($this->inboxURL);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $headers = array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_2_1 like Mac OS X; en-us) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5H11 Safari/525.20');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $html = curl_exec($ch);
-        $this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-        curl_close($ch);
-        $_rnr_se = $this->match('!<input.*?name="_rnr_se".*?value="(.*?)"!ms', $html, 1);
-        return $_rnr_se;
+        $this->getRnrSe();
     }
 
-    public function Send_SMS($to_phonenumber, $smstxt)
-    {
-        $_rnr_se = $this->get_rnr_se();
-        $sms_param = "id=&c=&number=".urlencode($to_phonenumber)."&smstext=".urlencode($smstxt)."&_rnr_se=".urlencode($_rnr_se);
-        $ch = curl_init($this->smsURL);
+
+    private function getPage($URL,$param=""){
+    	
+        
+        $ch = curl_init($URL);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $headers = array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_2_1 like Mac OS X; en-us) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5H11 Safari/525.20');
+        $headers = array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0');
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_REFERER, $this->lastURL);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $sms_param);      
-        $this->status = curl_exec($ch);
-        $this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        if($param != ""){
+          	curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
+        	curl_setopt($ch, CURLOPT_POST, true);
+        	curl_setopt($ch, CURLOPT_POSTFIELDS, $param); 
+        }
+    	$html = curl_exec($ch);
+    	
+    	$this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         curl_close($ch);
-        return $this->status;
+    	
+    	return $html;
+    }
+
+    private function getLoginAuth()
+    {
+    	if($this->login_auth == ""){
+       		$login_param = "accountType=GOOGLE&Email={$this->username}&Passwd={$this->password}&service=grandcentral&source=com.odwdinc.GoogleVoiceTool";
+	        $html = $this->getPage($this->loginURL,$login_param);
+	        $this->login_auth = $this->match('/Auth=([A-z0-9_-]+)/', $html, 1);
+        }
     }
     
-    public function Archive($ID)
+    private function getRnrSe()
+    {   
+        $html = $this->getPage($this->inboxURL);
+        $this->rnrSee = $this->match('!<input.*?name="_rnr_se".*?value="(.*?)"!ms', $html, 1);    
+    }
+    
+    
+    
+    public function sendSMS($to_phonenumber, $smstxt)
+    {
+        $smsParam = "id=&c=&number=".urlencode($to_phonenumber)."&smstext=".urlencode($smstxt)."&_rnr_se=".urlencode($this->rnrSee);        
+     	$this->getPage($this->smsURL,$smsParam );
+    }
+    
+    public function delete($ID){
+    	$deleteParam = "messages=".urlencode($ID)."&trash=1&_rnr_se=".urlencode($this->rnrSee);        
+    	$this->getPage($this->deleteURL,$deleteParam );
+    }
+    
+    public function archive($ID)
     {
     	    	
-    	$Archive_URL = $this->Archive_URL."p=1&label=unread&id=".urlencode($ID);
-    	echo $Mark_Read_URL;
-    	
-    	    $this->getLoginAuth();
-        $ch = curl_init($Archive_URL);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $headers = array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_2_1 like Mac OS X; en-us) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5H11 Safari/525.20');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $html = curl_exec($ch);
-        $this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-        curl_close($ch);
+    	$formatedArchiveURL = $this->archiveURL."p=1&label=unread&id=".urlencode($ID);
+    	$this->getPage($formatedArchiveURL);
     } 
     
-    
-    
-    public function Mark_Read($ID)
+    public function markRead($ID)
     {
     	    	
-    	$Mark_Read_URL = $this->Mark_Read_URL."p=1&label=unread&id=".urlencode($ID)."&read=1";
-    	echo $Mark_Read_URL;
-    	
-    	    $this->getLoginAuth();
-        $ch = curl_init($Mark_Read_URL);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $headers = array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_2_1 like Mac OS X; en-us) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5H11 Safari/525.20');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $html = curl_exec($ch);
-        $this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-        curl_close($ch);
-    }    
-    
-    public function Get_NEW_SMS()
+    	$formatedMarkReadURL = $this->markReadURL."p=1&label=unread&id=".urlencode($ID)."&read=1";
+   		$this->getPage($formatedMarkReadURL);
+    }
+   
+   //work in porgress
+    public function getSMS($onlyNew = false, $page = 1)
     {
-        $this->getLoginAuth();
-        $ch = curl_init($this->UnreadURL);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $headers = array("Authorization: GoogleLogin auth=".$this->login_auth, 'User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_2_1 like Mac OS X; en-us) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5H11 Safari/525.20');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $html_sorce = curl_exec($ch);
-        
-        $this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-        curl_close($ch);
+    	$json = $this->getPage("https://www.google.com/voice/b/0/request/messages?page=$page");
+    	
+    	
+    	echo $json;
+    	
+    	$data = json_decode($json);
+    	$this->unreadSMSCount = $data->unreadCounts->sms;
+    	$this->totalSize = $data->totalSize;
+    	$this->resultsPerPage = $data->resultsPerPage;
+    	
+    	$results = array();
+    	foreach($data->messageList as $key => $thread)
+    	{
+    	
+    		if($onlyNew == true && $thread->isRead != 0)
+        	{
+            	continue;
+        	}
+        	
+        	//echo "<br>Key : $key <br>";
+    		//print_r($thread);
+    		//echo "<br><br>";
+    	 
+    	 }
+    }
+    
+    public function getNewSMS()
+    {
+    
+        $htmlSorce = $this->getPage($this->unreadURL);
         
         $html = new simple_html_dom();
         
-        $html->load($html_sorce);
+        $html->load($htmlSorce);
         
         $newcalls = array();
         
@@ -200,6 +205,7 @@ class GoogleVoice
       	return $newcalls;
       
 	}
+    
     private function match($regex, $str, $out_ary = 0)
     {
         return preg_match($regex, $str, $match) == 1 ? $match[$out_ary] : false;
