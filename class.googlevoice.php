@@ -19,12 +19,12 @@ class GoogleVoice
 	private $lastURL;
 
 	private $urls = array(
-		'inbox' => 'https://www.google.com/voice/b/0/m',
-		'login' => 'https://www.google.com/accounts/ClientLogin',
-		'sms' => 'https://www.google.com/voice/m/sendsms',
-		'markRead' => 'https://www.google.com/voice/m/mark',
+		'inbox'   => 'https://www.google.com/voice/b/0/m',
+		'login'   => 'https://www.google.com/accounts/ClientLogin',
+		'sms'     => 'https://www.google.com/voice/m/sendsms',
+		'markRead'=> 'https://www.google.com/voice/m/mark',
 		'archive' => 'https://www.google.com/voice/m/archive',
-		'delete' => 'https://www.google.com/voice/b/0/inbox/deleteMessages',
+		'delete'  => 'https://www.google.com/voice/b/0/inbox/deleteMessages',
 	);
 
 	public $unreadSMSCount;
@@ -71,11 +71,11 @@ class GoogleVoice
 		if (empty($this->login_auth)) {
 
 			$params = array(
-				'accountType' => 'GOOGLE',
-				'Email' => $this->username,
-				'Passwd' => $this->password,
-				'service' => 'grandcentral',
-				'source' => 'com.odwdinc.GoogleVoiceTool',
+				'accountType'=> 'GOOGLE',
+				'Email'      => $this->username,
+				'Passwd'     => $this->password,
+				'service'    => 'grandcentral',
+				'source'     => 'com.odwdinc.GoogleVoiceTool',
 			);
 
 			$loginParam = http_build_query($params);
@@ -97,8 +97,8 @@ class GoogleVoice
 
 		$params = array(
 			'number' => $to_phonenumber,
-			'smstext' => $smstxt,
-			'_rnr_se' => $this->rnrSee,
+			'smstext'=> $smstxt,
+			'_rnr_se'=> $this->rnrSee,
 		);
 
 		$smsParam = http_build_query($params);
@@ -110,8 +110,8 @@ class GoogleVoice
 	{
 
 		$params = array(
-			'messages' => $ID,
-			'trash' => 1,
+			'messages'=> $ID,
+			'trash'   => 1,
 			'_rnr_se' => $this->rnrSee,
 		);
 
@@ -124,9 +124,9 @@ class GoogleVoice
 	{
 
 		$params = array(
-			'p' => 1,
-			'label' => 'unread',
-			'id' => $ID,
+			'p'    => 1,
+			'label'=> 'unread',
+			'id'   => $ID,
 		);
 
 		$archiveParam = http_build_query($params);
@@ -139,9 +139,9 @@ class GoogleVoice
 	{
 
 		$params = array(
-			'p' => 1,
-			'label' => 'unread',
-			'id' => $ID,
+			'p'    => 1,
+			'label'=> 'unread',
+			'id'   => $ID,
 			'read' => 1,
 		);
 
@@ -178,10 +178,10 @@ class GoogleVoice
 
 			/* Extract just the information that's useful. */
 			$results[] = array(
-				'id' => $thread->id,
-				'from' => $thread->displayNumber,
-				'text' => $thread->messageText,
-				'date' => $thread->displayStartDateTime,
+				'id'  => $thread->id,
+				'from'=> $thread->displayNumber,
+				'text'=> $thread->messageText,
+				'date'=> $thread->displayStartDateTime,
 			);
 
 		 }
