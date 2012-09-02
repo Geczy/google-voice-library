@@ -7,12 +7,12 @@ Forked __phpgooglevoice__ http://code.google.com/p/phpgooglevoice/
 
 This class only supported sending SMS.
 
-* Send_SMS(Phone_number, Message)
+* sendSMS(Phone_number, Message)
 
 This fork adds the following.
 
 
-1. Get_NEW_SMS()
+1. getNewSMS()
   * Get inbox unread messages.
   * Provides array:
     * ["Last_Message"]["Message"] Body of message.
@@ -22,13 +22,16 @@ This fork adds the following.
     * ["SMS_ID"]                  Unique ID of Message thread.
 
 
-2.  Mark_Read(ID)
+2.  markRead(ID)
   * Marks message as read 
   
 
-3.  Archive(ID)                     
-  * Archives the  message
+3.  archive(ID)                     
+  * Archives the message
 
+4.  delete(ID)
+  * Delete the message
+  
 
 Sample code to display all new SMS then archive
 ```php
@@ -38,7 +41,7 @@ Sample code to display all new SMS then archive
 
   echo "Curent Inbox<br>";
   
-  $messages = $gv->Get_NEW_SMS();
+  $messages = $gv->getNewSMS();
   
   foreach($messages as $message){
    echo "Received Message: ".$message["Last_Message"]["Message"]."<br>";
@@ -47,7 +50,7 @@ Sample code to display all new SMS then archive
    echo "+++ @: ".$message["Last_Message"]["Time"]."<br>";
    echo "+++ ID: ".$message["SMS_ID"]."<br><br>";
 	 
-   $gv->Archive($message["SMS_ID"]);
+   $gv->archive($message["SMS_ID"]);
   }
 ?>
 ```
@@ -57,7 +60,7 @@ Sample code to send new SMS
 <?php
   require 'class.googlevoice.php';
   $gv = new GoogleVoice("GmailAccount@gmail.com", "GmailPassword");
-  $gv->Send_SMS("PhoneNumber", "TextMsg");
+  $gv->sendSMS("PhoneNumber", "TextMsg");
 ?>  
 ```
 
