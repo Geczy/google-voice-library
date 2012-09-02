@@ -175,6 +175,7 @@ class GoogleVoice
 
 			/* Extract just the information that's useful. */
 			$results[] = array(
+				'id' => $thread->id,
 				'from' => $thread->displayNumber,
 				'text' => $thread->messageText,
 				'date' => $thread->displayStartDateTime,
