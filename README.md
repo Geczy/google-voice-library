@@ -1,25 +1,25 @@
 phpgooglevoice
 ==============
 
-A php based class of Google Voice API to Manage sms.
+A PHP based class of Google Voice API to manage SMS.
 
 Forked __phpgooglevoice__ http://code.google.com/p/phpgooglevoice/
 
-This class onley supported sending SMS.
+This class only supported sending SMS.
 
 * Send_SMS(Phone_number, Message)
 
-This Fork adds the fallowing.
+This fork adds the following.
 
 
 1. Get_NEW_SMS()
   * Get inbox unread messages.
-  * Porvides aray:
+  * Provides array:
     * ["Last_Message"]["Message"] Body of message.
     * ["Last_Message"]["Sender"]  Name, if in contact list.
     * ["Last_Message"]["Time"]    Time of message.
     * ["Phone_Num"]               Phone number.
-    * ["SMS_ID"]                  Uniquic ID of Message thread.
+    * ["SMS_ID"]                  Unique ID of Message thread.
 
 
 2.  Mark_Read(ID)
@@ -30,7 +30,7 @@ This Fork adds the fallowing.
   * Archives the  message
 
 
-Sample code to display all new SMS then arcive
+Sample code to display all new SMS then archive
 ```php
 <?php
   require 'class.googlevoice.php';
@@ -41,7 +41,7 @@ Sample code to display all new SMS then arcive
   $messages = $gv->Get_NEW_SMS();
   
   foreach($messages as $message){
-   echo "Recived Message: ".$message["Last_Message"]["Message"]."<br>";
+   echo "Received Message: ".$message["Last_Message"]["Message"]."<br>";
    echo "++ Form ".$message["Last_Message"]["Sender"]."<br>";
    echo "+++ #: ".$message["Phone_Num"]."<br>";
    echo "+++ @: ".$message["Last_Message"]["Time"]."<br>";
@@ -52,7 +52,7 @@ Sample code to display all new SMS then arcive
 ?>
 ```
 
-Sample code to Send new SMS
+Sample code to send new SMS
 ```php
 <?php
   require 'class.googlevoice.php';
