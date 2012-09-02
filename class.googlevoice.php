@@ -14,10 +14,8 @@ class GoogleVoice
 
 	public $username;
 	public $password;
-	public $smsData;
 
 	private $login_auth;
-	private $lastURL;
 	private $urls = array(
 		'inbox'   => 'https://www.google.com/voice/b/0/m',
 		'login'   => 'https://www.google.com/accounts/ClientLogin',
@@ -151,21 +149,16 @@ class GoogleVoice
 	public function getSMS($onlyNew = false, $page = 1)
 	{
 
-		/* @todo: Set this at execution instead of in this function. */
 		$url = 'https://www.google.com/voice/b/0/request/messages?';
-
-		$params = array('page' => $page);
-		$smsParams = http_build_query($params);
-		$json = $this->getPage($url.$smsParams);
-
+		$json = $this->getPage($url.'page='.$page);
 		$data = json_decode($json);
+
+		$contacts = $data->contacts->contactPhoneMap;
 
 		$results = array(
 			'unread' => $data->unreadCounts->sms,
 			'total'  => $data->totalSize,
 		);
-
-		$contacts = $data->contacts->contactPhoneMap;
 
 		foreach($data->messageList as $thread)
 		{
