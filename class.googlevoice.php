@@ -14,14 +14,10 @@ class GoogleVoice
 
 	public $username;
 	public $password;
-
-	public $unreadSMSCount;
-	public $totalSize;
-	public $resultsPerPage;
+	public $smsData;
 
 	private $login_auth;
 	private $lastURL;
-
 	private $urls = array(
 		'inbox'   => 'https://www.google.com/voice/b/0/m',
 		'login'   => 'https://www.google.com/accounts/ClientLogin',
@@ -29,6 +25,7 @@ class GoogleVoice
 		'markRead'=> 'https://www.google.com/voice/m/mark',
 		'archive' => 'https://www.google.com/voice/m/archive',
 		'delete'  => 'https://www.google.com/voice/b/0/inbox/deleteMessages',
+		'referer' => '',
 	);
 
 	public function __construct($username, $password)
@@ -48,7 +45,7 @@ class GoogleVoice
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$this->login_auth}", 'User-Agent: Mozilla/5.0'));
-		curl_setopt($ch, CURLOPT_REFERER, $this->lastURL);
+		curl_setopt($ch, CURLOPT_REFERER, $this->urls['referer']);
 
 		if(!empty($param)){
 			curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
@@ -57,7 +54,7 @@ class GoogleVoice
 		}
 
 		$response = curl_exec($ch);
-		$this->lastURL = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+		$this->urls['referer'] = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 
 		curl_close($ch);
 
@@ -163,12 +160,12 @@ class GoogleVoice
 
 		$data = json_decode($json);
 
-		/* @todo: Put these into one array. */
-		$this->unreadSMSCount = $data->unreadCounts->sms;
-		$this->totalSize = $data->totalSize;
-		$this->resultsPerPage = $data->resultsPerPage;
+		$results = array(
+			'unread' => $data->unreadCounts->sms,
+			'total'  => $data->totalSize,
+			'results'=> $data->resultsPerPage,
+		);
 
-		$results = array();
 		foreach($data->messageList as $thread)
 		{
 
