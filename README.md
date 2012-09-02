@@ -45,7 +45,7 @@ Sample code to display all new SMS then archive
   
   foreach($messages as $message){
    echo "Received Message: ".$message["Last_Message"]["Message"]."<br>";
-   echo "++ Form ".$message["Last_Message"]["Sender"]."<br>";
+   echo "++ From ".$message["Last_Message"]["Sender"]."<br>";
    echo "+++ #: ".$message["Phone_Num"]."<br>";
    echo "+++ @: ".$message["Last_Message"]["Time"]."<br>";
    echo "+++ ID: ".$message["SMS_ID"]."<br><br>";
