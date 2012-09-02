@@ -63,11 +63,23 @@ class GoogleVoice
 
 	private function getLoginAuth()
 	{
-		if($this->login_auth == ""){
-			$login_param = "accountType=GOOGLE&Email={$this->username}&Passwd={$this->password}&service=grandcentral&source=com.odwdinc.GoogleVoiceTool";
-			$html = $this->getPage($this->loginURL,$login_param);
+
+		if (empty($this->login_auth)) {
+
+			$params = array(
+				'accountType' => 'GOOGLE',
+				'Email' => $this->username,
+				'Passwd' => $this->password,
+				'service' => 'grandcentral',
+				'source' => 'com.odwdinc.GoogleVoiceTool',
+			);
+
+			$loginParam = http_build_query($params);
+			$html = $this->getPage($this->loginURL, $loginParam);
 			$this->login_auth = $this->match('/Auth=([A-z0-9_-]+)/', $html, 1);
+
 		}
+
 	}
 
 	private function getRnrSe()
@@ -80,34 +92,70 @@ class GoogleVoice
 
 	public function sendSMS($to_phonenumber, $smstxt)
 	{
-		$smsParam = "id=&c=&number=".urlencode($to_phonenumber)."&smstext=".urlencode($smstxt)."&_rnr_se=".urlencode($this->rnrSee);
-		$this->getPage($this->smsURL,$smsParam );
+
+		$params = array(
+			'id' => '',
+			'c' => '',
+			'number' => $to_phonenumber,
+			'smstext' => $smstxt,
+			'_rnr_se' => $this->rnrSee,
+		);
+
+		$smsParam = http_build_query($params);
+		$this->getPage($this->smsURL, $smsParam);
+
 	}
 
-	public function delete($ID){
-		$deleteParam = "messages=".urlencode($ID)."&trash=1&_rnr_se=".urlencode($this->rnrSee);
-		$this->getPage($this->deleteURL,$deleteParam );
+	public function delete($ID)
+	{
+
+		$params = array(
+			'messages' => $ID,
+			'trash' => 1,
+			'_rnr_se' => $this->rnrSee,
+		);
+
+		$deleteParam = http_build_query($params);
+		$this->getPage($this->deleteURL, $deleteParam);
+
 	}
 
 	public function archive($ID)
 	{
 
-		$formatedArchiveURL = $this->archiveURL."p=1&label=unread&id=".urlencode($ID);
+		$params = array(
+			'p' => 1,
+			'label' => 'unread',
+			'id' => $ID,
+		);
+
+		$archiveParam = http_build_query($params);
+		$formatedArchiveURL = $this->archiveURL.$archiveParam;
 		$this->getPage($formatedArchiveURL);
+
 	}
 
 	public function markRead($ID)
 	{
 
-		$formatedMarkReadURL = $this->markReadURL."p=1&label=unread&id=".urlencode($ID)."&read=1";
+		$params = array(
+			'p' => 1,
+			'label' => 'unread',
+			'id' => $ID,
+			'read' => 1,
+		);
+
+		$readParam = http_build_query($params);
+		$formatedMarkReadURL = $this->markReadURL.$readParam;
 		$this->getPage($formatedMarkReadURL);
+
 	}
 
    //work in porgress
 	public function getSMS($onlyNew = false, $page = 1)
 	{
-		$json = $this->getPage("https://www.google.com/voice/b/0/request/messages?page=$page");
 
+		$json = $this->getPage("https://www.google.com/voice/b/0/request/messages?page=$page");
 
 		echo $json;
 
