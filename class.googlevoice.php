@@ -1,10 +1,12 @@
 <?PHP
+
 /*
 Version     0.2
 License     This code is released under the MIT Open Source License. Feel free to do whatever you want with it.
 Author      lostleon@gmail.com, http://www.lostleon.com/
 LastUpdate  05/28/2010
 */
+
 require_once('simple_html_dom.php');
 
 class GoogleVoice
@@ -12,18 +14,18 @@ class GoogleVoice
 	public $username;
 	public $password;
 	public $status;
+
+	private $login_auth = '';
 	private $lastURL;
-	private $login_auth = "";
-	private $rnrSe = "";
 
-	private $inboxURL = 'https://www.google.com/voice/b/0/m/';
-	private $loginURL = 'https://www.google.com/accounts/ClientLogin';
-	private $smsURL = 'https://www.google.com/voice/m/sendsms';
-	private $unreadURL = 'https://www.google.com/voice/m/i/unread';
-	private $markReadURL = 'https://www.google.com/voice/m/mark?';
-	private $archiveURL = 'https://www.google.com/voice/m/archive?';
-	private $deleteURL = 'https://www.google.com/voice/b/0/inbox/deleteMessages/';
-
+	private $urls = array(
+		'inbox' => 'https://www.google.com/voice/b/0/m',
+		'login' => 'https://www.google.com/accounts/ClientLogin',
+		'sms' => 'https://www.google.com/voice/m/sendsms',
+		'markRead' => 'https://www.google.com/voice/m/mark',
+		'archive' => 'https://www.google.com/voice/m/archive',
+		'delete' => 'https://www.google.com/voice/b/0/inbox/deleteMessages',
+	);
 
 	public $unreadSMSCount;
 	public $totalSize;
@@ -77,7 +79,7 @@ class GoogleVoice
 			);
 
 			$loginParam = http_build_query($params);
-			$html = $this->getPage($this->loginURL, $loginParam);
+			$html = $this->getPage($this->urls['login'], $loginParam);
 			$this->login_auth = strstr($html, 'Auth=');
 
 		}
@@ -86,7 +88,7 @@ class GoogleVoice
 
 	private function getRnrSe()
 	{
-		$html = $this->getPage($this->inboxURL);
+		$html = $this->getPage($this->urls['inbox']);
 		$this->rnrSee = $this->match('!<input.*?name="_rnr_se".*?value="(.*?)"!ms', $html, 1);
 	}
 
@@ -94,15 +96,13 @@ class GoogleVoice
 	{
 
 		$params = array(
-			'id' => '',
-			'c' => '',
 			'number' => $to_phonenumber,
 			'smstext' => $smstxt,
 			'_rnr_se' => $this->rnrSee,
 		);
 
 		$smsParam = http_build_query($params);
-		$this->getPage($this->smsURL, $smsParam);
+		$this->getPage($this->urls['sms'], $smsParam);
 
 	}
 
@@ -116,7 +116,7 @@ class GoogleVoice
 		);
 
 		$deleteParam = http_build_query($params);
-		$this->getPage($this->deleteURL, $deleteParam);
+		$this->getPage($this->urls['delete'], $deleteParam);
 
 	}
 
@@ -130,8 +130,8 @@ class GoogleVoice
 		);
 
 		$archiveParam = http_build_query($params);
-		$formatedArchiveURL = $this->archiveURL.$archiveParam;
-		$this->getPage($formatedArchiveURL);
+		$archiveURL = $this->urls['archive'].'?'.$archiveParam;
+		$this->getPage($archiveURL);
 
 	}
 
@@ -146,8 +146,8 @@ class GoogleVoice
 		);
 
 		$readParam = http_build_query($params);
-		$formatedMarkReadURL = $this->markReadURL.$readParam;
-		$this->getPage($formatedMarkReadURL);
+		$readURL = $this->urls['markRead'].'?'.$readParam;
+		$this->getPage($readURL);
 
 	}
 
