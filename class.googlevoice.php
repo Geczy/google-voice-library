@@ -11,11 +11,15 @@ require_once('simple_html_dom.php');
 
 class GoogleVoice
 {
+
 	public $username;
 	public $password;
-	public $status;
 
-	private $login_auth = '';
+	public $unreadSMSCount;
+	public $totalSize;
+	public $resultsPerPage;
+
+	private $login_auth;
 	private $lastURL;
 
 	private $urls = array(
@@ -26,10 +30,6 @@ class GoogleVoice
 		'archive' => 'https://www.google.com/voice/m/archive',
 		'delete'  => 'https://www.google.com/voice/b/0/inbox/deleteMessages',
 	);
-
-	public $unreadSMSCount;
-	public $totalSize;
-	public $resultsPerPage;
 
 	public function __construct($username, $password)
 	{
