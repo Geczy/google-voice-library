@@ -7,11 +7,11 @@ class GoogleVoice
 
 	private $urls = array(
 		'login'   => 'https://www.google.com/accounts/ClientLogin',
-		'get'     => 'https://www.google.com/voice/b/0/request/messages',
-		'send'    => 'https://www.google.com/voice/m/sendsms',
-		'markRead'=> 'https://www.google.com/voice/m/mark',
-		'archive' => 'https://www.google.com/voice/m/archive',
-		'delete'  => 'https://www.google.com/voice/b/0/inbox/deleteMessages',
+		'get'     => 'https://www.google.com/voice/b/0/request/messages/',
+		'send'    => 'https://www.google.com/voice/b/0/sms/send/',
+		'markRead'=> 'https://www.google.com/voice/b/0/inbox/mark/',
+		'archive' => 'https://www.google.com/voice/b/0/inbox/archiveMessages/',
+		'delete'  => 'https://www.google.com/voice/b/0/inbox/deleteMessages/',
 		'referer' => '',
 	);
 
@@ -90,8 +90,8 @@ class GoogleVoice
 	{
 
 		$params = array(
-			'number' => $to_phonenumber,
-			'smstext'=> $smstxt,
+			'phoneNumber' => $to_phonenumber,
+			'text'=> $smstxt,
 			'_rnr_se'=> $this->getRnrSe(),
 		);
 
@@ -100,11 +100,11 @@ class GoogleVoice
 
 	}
 
-	public function delete($ID)
+	public function delete($id)
 	{
 
 		$params = array(
-			'messages'=> $ID,
+			'messages'=> $id,
 			'trash'   => 1,
 			'_rnr_se' => $this->getRnrSe(),
 		);
@@ -114,13 +114,13 @@ class GoogleVoice
 
 	}
 
-	public function archive($ID)
+	public function archive($id)
 	{
 
 		$params = array(
-			'p'    => 1,
-			'label'=> 'unread',
-			'id'   => $ID,
+			'messages' => $id,
+			'archive' => 1,
+			'_rnr_se' => $this->getRnrSe(),
 		);
 
 		$archiveParam = http_build_query($params);
@@ -129,14 +129,13 @@ class GoogleVoice
 
 	}
 
-	public function markRead($ID)
+	public function markRead($id)
 	{
 
 		$params = array(
-			'p'    => 1,
-			'label'=> 'unread',
-			'id'   => $ID,
+			'messages' => $id,
 			'read' => 1,
+			'_rnr_se' => $this->getRnrSe(),
 		);
 
 		$readParam = http_build_query($params);
@@ -158,7 +157,6 @@ class GoogleVoice
 
 		$json = $this->getPage($this->urls['get'].'?page='.$params['page']);
 		$data = json_decode($json);
-
 		$results = $this->parseSMS($data, $params);
 
 		return $results;
