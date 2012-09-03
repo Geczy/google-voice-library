@@ -24,7 +24,6 @@ class GoogleVoice
 
 		/* Preform authentication */
 		$this->getLoginAuth($user, $pass);
-		$this->getRnrSe();
 
 	}
 
@@ -77,7 +76,9 @@ class GoogleVoice
 	private function getRnrSe()
 	{
 		$html = $this->getPage($this->urls['inbox']);
-		$this->rnrSee = $this->match('!<input.*?name="_rnr_se".*?value="(.*?)"!ms', $html, 1);
+		$rnr_se = $this->match('!<input.*?name="_rnr_se".*?value="(.*?)"!ms', $html, 1);
+
+		return $rnr_se;
 	}
 
 	public function sendSMS($to_phonenumber, $smstxt)
@@ -86,7 +87,7 @@ class GoogleVoice
 		$params = array(
 			'number' => $to_phonenumber,
 			'smstext'=> $smstxt,
-			'_rnr_se'=> $this->rnrSee,
+			'_rnr_se'=> $this->getRnrSe(),
 		);
 
 		$smsParam = http_build_query($params);
@@ -100,7 +101,7 @@ class GoogleVoice
 		$params = array(
 			'messages'=> $ID,
 			'trash'   => 1,
-			'_rnr_se' => $this->rnrSee,
+			'_rnr_se' => $this->getRnrSe(),
 		);
 
 		$deleteParam = http_build_query($params);
