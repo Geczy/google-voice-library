@@ -121,10 +121,8 @@ class GoogleVoice
 	public function sendSMS($to, $msg, $id = '')
 	{
 
-		/* @todo: Is 'id' and 'c' necessary? */
 		$params = array(
-			'id'         => $id,
-			'c'          => 1,
+			'conversationId' => $id,
 			'phoneNumber'=> $to,
 			'text'       => $msg,
 			'_rnr_se'    => $this->getRnrSe(),
