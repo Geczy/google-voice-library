@@ -5,9 +5,6 @@ require_once('simple_html_dom.php');
 class GoogleVoice
 {
 
-	public $username;
-	public $password;
-
 	private $login_auth;
 	private $urls = array(
 		'inbox'   => 'https://www.google.com/voice/b/0/m',
@@ -20,11 +17,9 @@ class GoogleVoice
 		'referer' => '',
 	);
 
-	public function __construct($username, $password)
+	public function __construct($user, $pass)
 	{
-		$this->username = $username;
-		$this->password = $password;
-		$this->getLoginAuth();
+		$this->getLoginAuth($user, $pass);
 		$this->getRnrSe();
 	}
 
@@ -54,15 +49,15 @@ class GoogleVoice
 
 	}
 
-	private function getLoginAuth()
+	private function getLoginAuth($user, $pass)
 	{
 
 		if (empty($this->login_auth)) {
 
 			$params = array(
 				'accountType'=> 'GOOGLE',
-				'Email'      => $this->username,
-				'Passwd'     => $this->password,
+				'Email'      => $user,
+				'Passwd'     => $pass,
 				'service'    => 'grandcentral',
 				'source'     => 'com.odwdinc.GoogleVoiceTool',
 			);
