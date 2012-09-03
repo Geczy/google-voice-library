@@ -30,6 +30,13 @@ Features
 
 ```php
 <?php
+$params = array(
+	'history' => true, /* All messages in a conversation? */
+	'onlyNew' => false, /* Just unread messages? */
+	'page' => 1, /* Page of inbox to retrieve? */
+);
+
+
 $messages = $googleVoice->getInbox($params);
 ```
 
@@ -37,11 +44,6 @@ $messages = $googleVoice->getInbox($params);
 
 ```php
 <?php
-$params = array(
-	'history' => true, /* All messages in a conversation? */
-	'onlyNew' => false, /* Just unread messages? */
-);
-
 $googleVoice->sendText(8002029393, 'Hello, world!');
 ```
 
