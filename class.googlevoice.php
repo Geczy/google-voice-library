@@ -25,7 +25,7 @@ class GoogleVoice
 
 	}
 
-	private function getPage($url, $param = '')
+	private function getPage($url, $params = array())
 	{
 
 		$login_auth = !empty($_SESSION['Geczy']['login_auth']) ? $_SESSION['Geczy']['login_auth'] : '';
@@ -36,10 +36,10 @@ class GoogleVoice
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$login_auth}", 'User-Agent: Mozilla/5.0'));
 
-		if(!empty($param)){
+		if(!empty($params)){
 			curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
 			curl_setopt($ch, CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $param);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
 		}
 
 		$response = curl_exec($ch);
@@ -63,8 +63,7 @@ class GoogleVoice
 			'source'     => 'com.odwdinc.GoogleVoiceTool',
 		);
 
-		$loginParam = http_build_query($params);
-		$auth = strstr($this->getPage($this->urls['login'], $loginParam), 'Auth=');
+		$auth = strstr($this->getPage($this->urls['login'], $params), 'Auth=');
 
 		$_SESSION['Geczy']['login_auth'] = $auth;
 
@@ -92,8 +91,7 @@ class GoogleVoice
 			'_rnr_se'=> $this->getRnrSe(),
 		);
 
-		$smsParam = http_build_query($params);
-		$this->getPage($this->urls['send'], $smsParam);
+		$this->getPage($this->urls['send'], $params);
 
 	}
 
@@ -106,8 +104,7 @@ class GoogleVoice
 			'_rnr_se' => $this->getRnrSe(),
 		);
 
-		$deleteParam = http_build_query($params);
-		$this->getPage($this->urls['delete'], $deleteParam);
+		$this->getPage($this->urls['delete'], $params);
 
 	}
 
@@ -120,9 +117,7 @@ class GoogleVoice
 			'_rnr_se' => $this->getRnrSe(),
 		);
 
-		$archiveParam = http_build_query($params);
-		$archiveURL = $this->urls['archive'].'?'.$archiveParam;
-		$this->getPage($archiveURL);
+		$this->getPage($this->urls['archive'], $params);
 
 	}
 
@@ -135,9 +130,7 @@ class GoogleVoice
 			'_rnr_se' => $this->getRnrSe(),
 		);
 
-		$readParam = http_build_query($params);
-		$readURL = $this->urls['markRead'].'?'.$readParam;
-		$this->getPage($readURL);
+		$this->getPage($this->urls['markRead'], $params);
 
 	}
 
