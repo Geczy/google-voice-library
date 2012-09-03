@@ -16,9 +16,9 @@ This fork adds the following.
 1. getSMS(Params)
   * Get inbox unread messages.
   * Params array
-    * ['history']		Do you want to includ the history else jsut first and last. Defaults to false.
-    * ['onlyNew']		Do you want to includ onley new messages. Defaults to true.
-    * ['page']		Page number if more then one page is avable. Defaults to 1.
+    * ['history']		Do you want to include the history else just first and last. Defaults to false.
+    * ['onlyNew']		Do you want to include only new messages. Defaults to true.
+    * ['page']		Page number if more then one available. Defaults to 1.
   * Returns array:
     * ['unread']		Total unread sms messages anywhere.
     * ['total']		Total messages in inbox.
@@ -28,7 +28,7 @@ This fork adds the following.
       * ['firstText']	Body of first message.
       * ['date']	Date Time of message.
       * ['lastText']	Body of last message.
-      * ['history']	Key valu is the unique ID of Message thread.
+      * ['history']	Key value is the unique ID of Message thread.
         * ['from']	Name, if in contact list.
         * ['time']	Date Time of message.
         * ['message']	Body of message.
@@ -58,7 +58,7 @@ Sample code to display all new SMS then archive
   	echo "++ {$text['from']}<br>";
 	echo "++++ #: {$text['number']}<br>";
 	echo "++++ Last Message @: {$text['date']}<br>";
-	echo "++++ Last Message : {$text['lastText']}<br>";
+	echo "++++ Last Message : {$text['text']}<br>";
 	echo "++++ ID: {$id}<br><br>";
 		
 	foreach($text['history'] as $message){
