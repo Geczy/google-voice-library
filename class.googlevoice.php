@@ -118,7 +118,7 @@ class GoogleVoice
 
 	}
 
-	public function sendSMS($to, $msg, $id = '')
+	public function sendText($to, $msg, $id = '')
 	{
 
 		$params = array(
@@ -132,7 +132,7 @@ class GoogleVoice
 
 	}
 
-	public function getSMS($params = array())
+	public function getInbox($params = array())
 	{
 
 		$defaults = array(
@@ -145,13 +145,13 @@ class GoogleVoice
 
 		$json = $this->getPage($this->urls['get'].'?page='.$params['page']);
 		$data = json_decode($json);
-		$results = $this->parseSMS($data, $params);
+		$results = $this->parseTexts($data, $params);
 
 		return $results;
 
 	}
 
-	private function parseSMS($data, $params)
+	private function parseTexts($data, $params)
 	{
 
 		$contacts = $data->contacts->contactPhoneMap;
