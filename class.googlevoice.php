@@ -167,7 +167,7 @@ class GoogleVoice
 		{
 
 			/* This message is already read, so skip */
-			if($params['onlyNew'] && !empty($thread->isRead))
+			if($params['onlyNew'] && $thread->isRead)
 				continue;
 
 			/* Extract just the information that's useful. */
