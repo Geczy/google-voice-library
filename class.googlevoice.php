@@ -1,7 +1,5 @@
 <?PHP
 
-require_once('simple_html_dom.php');
-
 class GoogleVoice
 {
 
@@ -40,7 +38,9 @@ class GoogleVoice
 			curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+		var_dump(http_build_query($params));
 		}
+
 
 		$response = curl_exec($ch);
 		curl_close($ch);
