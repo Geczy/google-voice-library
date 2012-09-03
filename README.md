@@ -7,50 +7,65 @@ Forked __phpgooglevoice__ http://code.google.com/p/phpgooglevoice/
 
 This class only supported sending SMS.
 
-* sendSMS(Phone_number, Message)
-
 This fork adds the following.
 
 
-1. getNewSMS()
-  * Get inbox unread messages.
-  * Provides array:
-    * ["Last_Message"]["Message"] Body of message.
-    * ["Last_Message"]["Sender"]  Name, if in contact list.
-    * ["Last_Message"]["Time"]    Time of message.
-    * ["Phone_Num"]               Phone number.
-    * ["SMS_ID"]                  Unique ID of Message thread.
+0. sendSMS(Phone number, Message, ID)
 
+
+1. getSMS(Params)
+  * Get inbox unread messages.
+  * Params array
+    * ['history']		Do you want to includ the history else jsut first and last. Defaults to true.
+    * ['onlyNew']		Do you want to includ onley new messages. Defaults to false.
+    * ['page']		Page number if more then one page is avable. Defaults to 1.
+  * Returns array:
+    * ['unread']		Total unread sms messages anywhere.
+    * ['total']		Total messages in inbox.
+    * ['texts']
+      * ['from']	Name, if in contact list.
+      * ['number']	Phone number.
+      * ['firstText']	Body of first message.
+      * ['date']	Date Time of message.
+      * ['lastText']	Body of last message.
+      * ['history']	Key valu is the unique ID of Message thread.
+        * ['from']	Name, if in contact list.
+        * ['time']	Date Time of message.
+        * ['message']	Body of message.
 
 2.  markRead(ID)
-  * Marks message as read
+  * Marks message as read 
+  
 
-
-3.  archive(ID)
+3.  archive(ID)                     
   * Archives the message
 
 4.  delete(ID)
   * Delete the message
-
+  
 
 Sample code to display all new SMS then archive
 ```php
 <?php
   require 'class.googlevoice.php';
-  $gv = new GoogleVoice("GmailAccount@gmail.com", "GmailPassword");
-
-  echo "Curent Inbox<br>";
-
+  $gv = new GoogleVoice("GmailAccount@gmail.com", "GmailPassword");  
   $messages = $gv->getNewSMS();
-
-  foreach($messages as $message){
-   echo "Received Message: ".$message["Last_Message"]["Message"]."<br>";
-   echo "++ From ".$message["Last_Message"]["Sender"]."<br>";
-   echo "+++ #: ".$message["Phone_Num"]."<br>";
-   echo "+++ @: ".$message["Last_Message"]["Time"]."<br>";
-   echo "+++ ID: ".$message["SMS_ID"]."<br><br>";
-
-   $gv->archive($message["SMS_ID"]);
+  
+  echo "Curent Inbox<br>";
+  echo "Unread count: {$messages['unread']} In inbox: {$messages['total']}<br><br>";
+  
+  foreach ($messages['texts'] as $id=>$text){
+  	echo "++ {$text['from']}<br>";
+	echo "++++ #: {$text['number']}<br>";
+	echo "++++ Last Message @: {$text['date']}<br>";
+	echo "++++ Last Message : {$text['lastText']}<br>";
+	echo "++++ ID: {$id}<br><br>";
+		
+	foreach($text['history'] as $message){
+		echo "++++++++ Form: {$message['from']} @: {$message['time']}<br>"; 
+		echo "++++++++ : {$message['message']}<br><br>"; 
+	}	 
+   	$gv->archive($id);
   }
 ?>
 ```
@@ -61,5 +76,8 @@ Sample code to send new SMS
   require 'class.googlevoice.php';
   $gv = new GoogleVoice("GmailAccount@gmail.com", "GmailPassword");
   $gv->sendSMS("PhoneNumber", "TextMsg");
-?>
+?>  
 ```
+
+
+
