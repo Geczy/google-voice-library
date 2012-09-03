@@ -1,6 +1,7 @@
 <?PHP
 
-class GoogleVoice
+namespace Geczy\Voice;
+class GoogleVoiceLibrary
 {
 
 	private $urls = array(
