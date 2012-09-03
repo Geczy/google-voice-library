@@ -33,7 +33,6 @@ class GoogleVoice
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$_SESSION['Geczy']['login_auth']}", 'User-Agent: Mozilla/5.0'));
 
 		if(!empty($params)){
-			curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
 		}
