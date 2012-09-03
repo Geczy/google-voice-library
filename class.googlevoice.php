@@ -26,21 +26,17 @@ class GoogleVoice
 	private function getPage($url, $params = array())
 	{
 
-		$login_auth = !empty($_SESSION['Geczy']['login_auth']) ? $_SESSION['Geczy']['login_auth'] : '';
-
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$login_auth}", 'User-Agent: Mozilla/5.0'));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$_SESSION['Geczy']['login_auth']}", 'User-Agent: Mozilla/5.0'));
 
 		if(!empty($params)){
 			curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
-		var_dump(http_build_query($params));
 		}
-
 
 		$response = curl_exec($ch);
 		curl_close($ch);
@@ -51,7 +47,6 @@ class GoogleVoice
 
 	private function getLoginAuth($user, $pass)
 	{
-
 		if (!empty($_SESSION['Geczy']['login_auth']))
 			return false;
 
@@ -63,7 +58,8 @@ class GoogleVoice
 			'source'     => 'com.odwdinc.GoogleVoiceTool',
 		);
 
-		$auth = strstr($this->getPage($this->urls['login'], $params), 'Auth=');
+		$results = $this->getPage($this->urls['login'], $params);
+		$auth = strstr($results, 'Auth=');
 
 		$_SESSION['Geczy']['login_auth'] = $auth;
 
