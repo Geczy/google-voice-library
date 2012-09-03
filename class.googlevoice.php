@@ -1,12 +1,5 @@
 <?PHP
 
-/*
-Version     0.2
-License     This code is released under the MIT Open Source License. Feel free to do whatever you want with it.
-Author      lostleon@gmail.com, http://www.lostleon.com/
-LastUpdate  05/28/2010
-*/
-
 require_once('simple_html_dom.php');
 
 class GoogleVoice
@@ -146,11 +139,18 @@ class GoogleVoice
 
 	}
 
-	public function getSMS($onlyNew = false, $page = 1)
+	public function getSMS($params = array())
 	{
+		$defaults = array(
+			'history'=> false,
+			'onlyNew'=> true,
+			'page'   => 1,
+		);
+
+		$params = array_merge($defaults, $params);
 
 		$url = 'https://www.google.com/voice/b/0/request/messages?';
-		$json = $this->getPage($url.'page='.$page);
+		$json = $this->getPage($url.'page='.$params['page']);
 		$data = json_decode($json);
 
 		$contacts = $data->contacts->contactPhoneMap;
@@ -164,18 +164,29 @@ class GoogleVoice
 		{
 
 			/* This message is already read, so skip */
-			if($onlyNew && !empty($thread->isRead))
+			if($params['onlyNew'] && !empty($thread->isRead))
 				continue;
 
 			/* Extract just the information that's useful. */
 			$number = $thread->phoneNumber;
-			$results[] = array(
-				'id'    => $thread->id,
+			$results['texts'][$thread->id] = array(
 				'from'  => $contacts->$number->name,
 				'number'=> $thread->displayNumber,
 				'text'  => $thread->messageText,
 				'date'  => $thread->displayStartDateTime,
 			);
+
+			if ($params['history'])
+			{
+				foreach($thread->children as $child)
+				{
+					$results['texts'][$thread->id]['history'][] = array(
+						'from' => $child->type == 11 ? 'Me' : $results['texts'][$thread->id]['from'],
+						'time' => $child->displayStartDateTime,
+						'message' => $child->message,
+					);
+				}
+			}
 
 		 }
 
