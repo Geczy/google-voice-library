@@ -58,7 +58,7 @@ class GoogleVoice
 		);
 
 		$results = $this->getPage($this->urls['login'], $params);
-		$auth = strstr($results, 'Auth=');
+		$auth = strstr(trim($results), 'Auth=');
 
 		$_SESSION['Geczy']['login_auth'] = $auth;
 
