@@ -1,7 +1,7 @@
 Google Voice Library
 =================
 
-Google Voice API is a PHP based library for managing texts.
+Google Voice Library is a PHP based library for managing texts on Google Voice.
 
 Quick start
 ------------
