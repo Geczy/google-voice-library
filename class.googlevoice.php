@@ -72,22 +72,23 @@ class GoogleVoice
 
 		$result = $this->getPage($this->urls['get']);
 		$result = json_decode($result);
-		
+
 		$_SESSION['Geczy']['rnr_se'] = $result->r;
-		
+
 		return $result->r;
 
 	}
 
-	public function sendSMS($to_phonenumber, $smstxt,$id ="")
+	public function sendSMS($to, $msg, $id = '')
 	{
 
+		/* @todo: Is 'id' and 'c' necessary? */
 		$params = array(
-			'id' => $id,
-			'c' => "1",
-			'phoneNumber' => $to_phonenumber,
-			'text'=> $smstxt,
-			'_rnr_se'=> $this->getRnrSe(),
+			'id'         => $id,
+			'c'          => 1,
+			'phoneNumber'=> $to,
+			'text'       => $msg,
+			'_rnr_se'    => $this->getRnrSe(),
 		);
 
 		$this->getPage($this->urls['send'], $params);
