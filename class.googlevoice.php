@@ -55,7 +55,7 @@ class GoogleVoiceLibrary
 			'Email'      => $user,
 			'Passwd'     => $pass,
 			'service'    => 'grandcentral',
-			'source'     => 'com.odwdinc.GoogleVoiceTool',
+			'source'     => 'Geczy-Google-Voice-Library',
 		);
 
 		$results = $this->getPage($this->urls['login'], $params);
