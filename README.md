@@ -58,7 +58,7 @@ Sample code to display all new SMS then archive
   	echo "++ {$text['from']}<br>";
 	echo "++++ #: {$text['number']}<br>";
 	echo "++++ Last Message @: {$text['date']}<br>";
-	echo "++++ Last Message : {$text['lastText']}<br>";
+	echo "++++ Last Message : {$text['text']}<br>";
 	echo "++++ ID: {$id}<br><br>";
 		
 	foreach($text['history'] as $message){
