@@ -174,9 +174,8 @@ class GoogleVoice
 			$results['texts'][$thread->id] = array(
 				'from'  => $contacts->$number->name,
 				'number'=> $thread->displayNumber,
-				'firstText'  => $thread->messageText,
 				'date'  => $thread->displayStartDateTime,
-				'lastText' => $thread->children[count($thread->children)-1]->message,
+				'text' => $thread->children[count($thread->children)-1]->message,
 			);
 
 			if ($params['history'])
