@@ -79,22 +79,6 @@ class GoogleVoice
 
 	}
 
-	public function sendSMS($to, $msg, $id = '')
-	{
-
-		/* @todo: Is 'id' and 'c' necessary? */
-		$params = array(
-			'id'         => $id,
-			'c'          => 1,
-			'phoneNumber'=> $to,
-			'text'       => $msg,
-			'_rnr_se'    => $this->getRnrSe(),
-		);
-
-		$this->getPage($this->urls['send'], $params);
-
-	}
-
 	public function delete($id)
 	{
 
@@ -131,6 +115,22 @@ class GoogleVoice
 		);
 
 		$this->getPage($this->urls['markRead'], $params);
+
+	}
+
+	public function sendSMS($to, $msg, $id = '')
+	{
+
+		/* @todo: Is 'id' and 'c' necessary? */
+		$params = array(
+			'id'         => $id,
+			'c'          => 1,
+			'phoneNumber'=> $to,
+			'text'       => $msg,
+			'_rnr_se'    => $this->getRnrSe(),
+		);
+
+		$this->getPage($this->urls['send'], $params);
 
 	}
 
