@@ -16,8 +16,8 @@ This fork adds the following.
 1. getSMS(Params)
   * Get inbox unread messages.
   * Params array
-    * ['history']		Do you want to includ the history else jsut first and last. Defaults to true.
-    * ['onlyNew']		Do you want to includ onley new messages. Defaults to false.
+    * ['history']		Do you want to includ the history else jsut first and last. Defaults to false.
+    * ['onlyNew']		Do you want to includ onley new messages. Defaults to true.
     * ['page']		Page number if more then one page is avable. Defaults to 1.
   * Returns array:
     * ['unread']		Total unread sms messages anywhere.
