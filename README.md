@@ -66,6 +66,37 @@ $googleVoice->delete('message_id');
 $googleVoice->markRead('message_id');
 ```
 
+Example inbox response
+------------
+
+```php
+<?php
+array (size=3)
+  'unread' => int 98
+  'total' => int 1
+  'texts' =>
+	array (size=1)
+	  '10addc3d5f181c34c94332c8d68b2373ac1df14n' =>
+		array (size=5)
+		  'from' => string 'Tawr' (length=4)
+		  'number' => string '(555) 555-5555' (length=14)
+		  'date' => string '9/3/12 6:22 PM' (length=14)
+		  'text' => string 'Oh wow! Ill visit it later and judge your work. :3' (length=51)
+		  'history' =>
+			array (size=131)
+			  0 =>
+				array (size=3)
+				  'from' => string 'Me' (length=2)
+				  'time' => string '9/3/12 12:31 PM' (length=15)
+				  'message' => string 'I didnt get any texts last night >:|' (length=37)
+			  1 =>
+				array (size=3)
+				  'from' => string 'Me' (length=2)
+				  'time' => string '9/3/12 12:32 PM' (length=15)
+				  'message' => string 'Also youre going to be mad. I wake up and all my ivy is gone. ' (length=63)
+			...
+```
+
 Bug tracker
 -----------
 
