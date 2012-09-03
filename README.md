@@ -1,83 +1,88 @@
-phpgooglevoice
-==============
+Google Voice Library
+=================
 
-A PHP based class of Google Voice API to manage SMS.
+Google Voice API is a PHP based library for managing texts.
 
-Forked __phpgooglevoice__ http://code.google.com/p/phpgooglevoice/
+Quick start
+------------
 
-This class only supported sending SMS.
+Clone the repo, `git clone git://github.com/Geczy/google-voice-library.git`, or [download the latest release](https://github.com/Geczy/google-voice-library/zipball/master).
 
-This fork adds the following.
-
-
-0. sendSMS(Phone number, Message, ID)
-
-
-1. getSMS(Params)
-  * Get inbox unread messages.
-  * Params array
-    * ['history']		Do you want to include the history else just first and last. Defaults to false.
-    * ['onlyNew']		Do you want to include only new messages. Defaults to true.
-    * ['page']		Page number if more then one available. Defaults to 1.
-  * Returns array:
-    * ['unread']		Total unread sms messages anywhere.
-    * ['total']		Total messages in inbox.
-    * ['texts']
-      * ['from']	Name, if in contact list.
-      * ['number']	Phone number.
-      * ['firstText']	Body of first message.
-      * ['date']	Date Time of message.
-      * ['lastText']	Body of last message.
-      * ['history']	Key value is the unique ID of Message thread.
-        * ['from']	Name, if in contact list.
-        * ['time']	Date Time of message.
-        * ['message']	Body of message.
-
-2.  markRead(ID)
-  * Marks message as read 
-  
-
-3.  archive(ID)                     
-  * Archives the message
-
-4.  delete(ID)
-  * Delete the message
-  
-
-Sample code to display all new SMS then archive
 ```php
 <?php
-  require 'class.googlevoice.php';
-  $gv = new GoogleVoice("GmailAccount@gmail.com", "GmailPassword");  
-  $messages = $gv->getNewSMS();
-  
-  echo "Curent Inbox<br>";
-  echo "Unread count: {$messages['unread']} In inbox: {$messages['total']}<br><br>";
-  
-  foreach ($messages['texts'] as $id=>$text){
-  	echo "++ {$text['from']}<br>";
-	echo "++++ #: {$text['number']}<br>";
-	echo "++++ Last Message @: {$text['date']}<br>";
-	echo "++++ Last Message : {$text['text']}<br>";
-	echo "++++ ID: {$id}<br><br>";
-		
-	foreach($text['history'] as $message){
-		echo "++++++++ Form: {$message['from']} @: {$message['time']}<br>"; 
-		echo "++++++++ : {$message['message']}<br><br>"; 
-	}	 
-   	$gv->archive($id);
-  }
-?>
+include_once('class.googlevoice.php');
+
+$googleVoice = new \Geczy\Voice\GoogleVoiceLibrary('username', 'password');
+$params = array(
+	'history' => true, /* All messages in a conversation? */
+	'onlyNew' => false, /* Just unread messages? */
+);
+
+$messages = $googleVoice->getInbox($params);
+
+var_dump($messages);
 ```
 
-Sample code to send new SMS
+Features
+------------
+
+### Retrieve your inbox
+
 ```php
 <?php
-  require 'class.googlevoice.php';
-  $gv = new GoogleVoice("GmailAccount@gmail.com", "GmailPassword");
-  $gv->sendSMS("PhoneNumber", "TextMsg");
-?>  
+$messages = $googleVoice->getInbox($params);
 ```
 
+### Send a text
 
+```php
+<?php
+$params = array(
+	'history' => true, /* All messages in a conversation? */
+	'onlyNew' => false, /* Just unread messages? */
+);
 
+$googleVoice->sendText(8002029393, 'Hello, world!');
+```
+
+### Archive a conversation
+
+```php
+<?php
+$googleVoice->archive('message_id');
+```
+
+### Delete a conversation
+
+```php
+<?php
+$googleVoice->delete('message_id');
+```
+
+### Mark a conversation as read
+
+```php
+<?php
+$googleVoice->markRead('message_id');
+```
+
+Bug tracker
+-----------
+
+Have a bug? Please create an issue here on GitHub!
+
+https://github.com/Geczy/google-voice-library/issues
+
+Copyright and License
+---------------------
+
+Copyright 2012 Matthew Gates
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in
+compliance with the License. You may obtain a copy of the License in the LICENSE file, or at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is
+distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and limitations under the License.
