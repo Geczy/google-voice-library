@@ -12,7 +12,6 @@ class GoogleVoice
 		'markRead'=> 'https://www.google.com/voice/b/0/inbox/mark/',
 		'archive' => 'https://www.google.com/voice/b/0/inbox/archiveMessages/',
 		'delete'  => 'https://www.google.com/voice/b/0/inbox/deleteMessages/',
-		'referer' => '',
 	);
 
 	public function __construct($user, $pass)
@@ -36,7 +35,6 @@ class GoogleVoice
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$login_auth}", 'User-Agent: Mozilla/5.0'));
-		curl_setopt($ch, CURLOPT_REFERER, $this->urls['referer']);
 
 		if(!empty($param)){
 			curl_setopt($ch, CURLOPT_POST, "application/x-www-form-urlencoded");
@@ -45,7 +43,6 @@ class GoogleVoice
 		}
 
 		$response = curl_exec($ch);
-		$this->urls['referer'] = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 		curl_close($ch);
 
 		return $response;
