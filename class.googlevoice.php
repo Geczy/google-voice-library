@@ -6,7 +6,6 @@ class GoogleVoice
 {
 
 	private $urls = array(
-		'inbox'   => 'https://www.google.com/voice/b/0/m',
 		'login'   => 'https://www.google.com/accounts/ClientLogin',
 		'get'     => 'https://www.google.com/voice/b/0/request/messages',
 		'send'    => 'https://www.google.com/voice/m/sendsms',
@@ -68,17 +67,23 @@ class GoogleVoice
 		);
 
 		$loginParam = http_build_query($params);
-		$html = $this->getPage($this->urls['login'], $loginParam);
-		$_SESSION['Geczy']['login_auth'] = strstr($html, 'Auth=');
+		$auth = strstr($this->getPage($this->urls['login'], $loginParam), 'Auth=');
+
+		$_SESSION['Geczy']['login_auth'] = $auth;
 
 	}
 
-	private function getRnrSe()
+	public function getRnrSe()
 	{
-		$html = $this->getPage($this->urls['inbox']);
-		$rnr_se = $this->match('!<input.*?name="_rnr_se".*?value="(.*?)"!ms', $html, 1);
 
-		return $rnr_se;
+		if (!empty($_SESSION['Geczy']['rnr_se']))
+			return $_SESSION['Geczy']['rnr_se'];
+
+		$result = $this->getPage($this->urls['get']);
+		$result = json_decode($result);
+
+		return $result->r;
+
 	}
 
 	public function sendSMS($to_phonenumber, $smstxt)
@@ -202,11 +207,6 @@ class GoogleVoice
 
 		 return $results;
 
-	}
-
-	private function match($regex, $str, $out_ary = 0)
-	{
-		return preg_match($regex, $str, $match) == 1 ? $match[$out_ary] : false;
 	}
 
 }
