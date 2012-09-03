@@ -72,15 +72,19 @@ class GoogleVoice
 
 		$result = $this->getPage($this->urls['get']);
 		$result = json_decode($result);
-
+		
+		$_SESSION['Geczy']['rnr_se'] = $result->r;
+		
 		return $result->r;
 
 	}
 
-	public function sendSMS($to_phonenumber, $smstxt)
+	public function sendSMS($to_phonenumber, $smstxt,$id ="")
 	{
 
 		$params = array(
+			'id' => $id,
+			'c' => "1",
 			'phoneNumber' => $to_phonenumber,
 			'text'=> $smstxt,
 			'_rnr_se'=> $this->getRnrSe(),
@@ -170,8 +174,9 @@ class GoogleVoice
 			$results['texts'][$thread->id] = array(
 				'from'  => $contacts->$number->name,
 				'number'=> $thread->displayNumber,
-				'text'  => $thread->messageText,
+				'firstText'  => $thread->messageText,
 				'date'  => $thread->displayStartDateTime,
+				'lastText' => $thread->children[count($thread->children)-1]->message,
 			);
 
 			if ($params['history'])
