@@ -5,7 +5,6 @@ require_once('simple_html_dom.php');
 class GoogleVoice
 {
 
-	private $login_auth;
 	private $urls = array(
 		'inbox'   => 'https://www.google.com/voice/b/0/m',
 		'login'   => 'https://www.google.com/accounts/ClientLogin',
@@ -19,19 +18,26 @@ class GoogleVoice
 
 	public function __construct($user, $pass)
 	{
+
+		/* Start the session. */
+		if (!isset($_SESSION)) session_start();
+
+		/* Preform authentication */
 		$this->getLoginAuth($user, $pass);
 		$this->getRnrSe();
+
 	}
 
 	private function getPage($url, $param = '')
 	{
 
-		$ch = curl_init($url);
+		$login_auth = !empty($_SESSION['Geczy']['login_auth']) ? $_SESSION['Geczy']['login_auth'] : '';
 
+		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$this->login_auth}", 'User-Agent: Mozilla/5.0'));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$login_auth}", 'User-Agent: Mozilla/5.0'));
 		curl_setopt($ch, CURLOPT_REFERER, $this->urls['referer']);
 
 		if(!empty($param)){
@@ -42,7 +48,6 @@ class GoogleVoice
 
 		$response = curl_exec($ch);
 		$this->urls['referer'] = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-
 		curl_close($ch);
 
 		return $response;
@@ -52,21 +57,20 @@ class GoogleVoice
 	private function getLoginAuth($user, $pass)
 	{
 
-		if (empty($this->login_auth)) {
+		if (!empty($_SESSION['Geczy']['login_auth']))
+			return false;
 
-			$params = array(
-				'accountType'=> 'GOOGLE',
-				'Email'      => $user,
-				'Passwd'     => $pass,
-				'service'    => 'grandcentral',
-				'source'     => 'com.odwdinc.GoogleVoiceTool',
-			);
+		$params = array(
+			'accountType'=> 'GOOGLE',
+			'Email'      => $user,
+			'Passwd'     => $pass,
+			'service'    => 'grandcentral',
+			'source'     => 'com.odwdinc.GoogleVoiceTool',
+		);
 
-			$loginParam = http_build_query($params);
-			$html = $this->getPage($this->urls['login'], $loginParam);
-			$this->login_auth = strstr($html, 'Auth=');
-
-		}
+		$loginParam = http_build_query($params);
+		$html = $this->getPage($this->urls['login'], $loginParam);
+		$_SESSION['Geczy']['login_auth'] = strstr($html, 'Auth=');
 
 	}
 
