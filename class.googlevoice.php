@@ -12,7 +12,8 @@ class GoogleVoice
 	private $urls = array(
 		'inbox'   => 'https://www.google.com/voice/b/0/m',
 		'login'   => 'https://www.google.com/accounts/ClientLogin',
-		'sms'     => 'https://www.google.com/voice/m/sendsms',
+		'get'     => 'https://www.google.com/voice/b/0/request/messages',
+		'send'    => 'https://www.google.com/voice/m/sendsms',
 		'markRead'=> 'https://www.google.com/voice/m/mark',
 		'archive' => 'https://www.google.com/voice/m/archive',
 		'delete'  => 'https://www.google.com/voice/b/0/inbox/deleteMessages',
@@ -90,7 +91,7 @@ class GoogleVoice
 		);
 
 		$smsParam = http_build_query($params);
-		$this->getPage($this->urls['sms'], $smsParam);
+		$this->getPage($this->urls['send'], $smsParam);
 
 	}
 
@@ -149,8 +150,7 @@ class GoogleVoice
 
 		$params = array_merge($defaults, $params);
 
-		$url = 'https://www.google.com/voice/b/0/request/messages?';
-		$json = $this->getPage($url.'page='.$params['page']);
+		$json = $this->getPage($this->urls['get'].'?page='.$params['page']);
 		$data = json_decode($json);
 
 		$contacts = $data->contacts->contactPhoneMap;
