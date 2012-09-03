@@ -142,6 +142,7 @@ class GoogleVoice
 
 	public function getSMS($params = array())
 	{
+
 		$defaults = array(
 			'history'=> false,
 			'onlyNew'=> true,
@@ -152,6 +153,15 @@ class GoogleVoice
 
 		$json = $this->getPage($this->urls['get'].'?page='.$params['page']);
 		$data = json_decode($json);
+
+		$results = $this->parseSMS($data, $params);
+
+		return $results;
+
+	}
+
+	private function parseSMS($data, $params)
+	{
 
 		$contacts = $data->contacts->contactPhoneMap;
 
