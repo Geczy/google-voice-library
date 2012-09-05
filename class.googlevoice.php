@@ -27,11 +27,13 @@ class GoogleVoiceLibrary
 	private function getPage($url, $params = array())
 	{
 
+		$login_auth = !empty($_SESSION['Geczy']['login_auth']) ? $_SESSION['Geczy']['login_auth'] : '';
+
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$_SESSION['Geczy']['login_auth']}", 'User-Agent: Mozilla/5.0'));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$login_auth}", 'User-Agent: Mozilla/5.0'));
 
 		if(!empty($params)){
 			curl_setopt($ch, CURLOPT_POST, true);
