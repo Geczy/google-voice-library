@@ -1,4 +1,20 @@
-<?PHP
+<?php
+
+/**
+ * Google Voice Library.
+ *
+ * LICENSE:
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * You may not use this work except in compliance with the License.
+ * You may obtain a copy of the License in the LICENSE file, or at:
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * @author       Matthew Gates <info@mgates.me>
+ * @copyright    Copyright (c) 2012 Matthew Gates.
+ * @license      http://www.apache.org/licenses/LICENSE-2.0
+ * @link         https://github.com/Geczy/google-voice-library
+ */
 
 namespace Geczy\Voice;
 class GoogleVoiceLibrary
