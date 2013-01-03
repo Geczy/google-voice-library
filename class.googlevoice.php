@@ -141,9 +141,7 @@ class GoogleVoiceLibrary
 		if ( !empty( $_SESSION['Geczy']['rnr_se'] ) )
 			return $_SESSION['Geczy']['rnr_se'];
 
-		$result = $this->get_page( $this->urls['get'] );
-		$result = json_decode( $result );
-
+		$result = json_decode( $this->get_page( $this->urls['get'] ) );
 		$_SESSION['Geczy']['rnr_se'] = $result->r;
 
 		return $result->r;
@@ -163,7 +161,7 @@ class GoogleVoiceLibrary
 			'_rnr_se'  => $this->get_rnrse(),
 		);
 
-		$this->get_page( $this->urls['delete'], $params );
+		return json_decode( $this->get_page( $this->urls['delete'], $params ) );
 	}
 
 
@@ -180,7 +178,7 @@ class GoogleVoiceLibrary
 			'_rnr_se'  => $this->get_rnrse(),
 		);
 
-		$this->get_page( $this->urls['archive'], $params );
+		return json_decode( $this->get_page( $this->urls['archive'], $params ) );
 	}
 
 
@@ -197,7 +195,7 @@ class GoogleVoiceLibrary
 			'_rnr_se'  => $this->get_rnrse(),
 		);
 
-		$this->get_page( $this->urls['mark_read'], $params );
+		return json_decode( $this->get_page( $this->urls['mark_read'], $params ) );
 	}
 
 
@@ -217,7 +215,7 @@ class GoogleVoiceLibrary
 			'_rnr_se'        => $this->get_rnrse(),
 		);
 
-		$this->get_page( $this->urls['send'], $params );
+		return json_decode( $this->get_page( $this->urls['send'], $params ) );
 	}
 
 
@@ -237,9 +235,8 @@ class GoogleVoiceLibrary
 
 		$params = array_merge( $defaults, $params );
 
-		$json = $this->get_page( $this->urls['get'].'?page='.$params['page'] );
-		$data = json_decode( $json );
-		$results = $this->parse_texts( $data, $params );
+		$json = json_decode( $this->get_page( $this->urls['get'].'?page='.$params['page'] ) );
+		$results = $this->parse_texts( $json, $params );
 
 		return $results;
 	}
