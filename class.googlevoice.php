@@ -10,169 +10,222 @@
  * You may obtain a copy of the License in the LICENSE file, or at:
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * @author       Matthew Gates <info@mgates.me>
  * @copyright    Copyright (c) 2012 Matthew Gates.
  * @license      http://www.apache.org/licenses/LICENSE-2.0
  * @link         https://github.com/Geczy/google-voice-library
+ * @author       Matthew Gates <info@mgates.me>
+ * @package      Google Voice
  */
+
 
 namespace Geczy\Voice;
 class GoogleVoiceLibrary
 {
 
 	private $urls = array(
-		'login'   => 'https://www.google.com/accounts/ClientLogin',
-		'get'     => 'https://www.google.com/voice/b/0/request/messages/',
-		'send'    => 'https://www.google.com/voice/b/0/sms/send/',
-		'markRead'=> 'https://www.google.com/voice/b/0/inbox/mark/',
-		'archive' => 'https://www.google.com/voice/b/0/inbox/archiveMessages/',
-		'delete'  => 'https://www.google.com/voice/b/0/inbox/deleteMessages/',
+		'login'     => 'https://www.google.com/accounts/ClientLogin',
+		'get'       => 'https://www.google.com/voice/b/0/request/messages/',
+		'send'      => 'https://www.google.com/voice/b/0/sms/send/',
+		'mark_read' => 'https://www.google.com/voice/b/0/inbox/mark/',
+		'archive'   => 'https://www.google.com/voice/b/0/inbox/archiveMessages/',
+		'delete'    => 'https://www.google.com/voice/b/0/inbox/deleteMessages/',
 	);
 
-	public function __construct($user, $pass)
+	/**
+	 * Username and password to the Google Voice account.
+	 *
+	 * @param string $user
+	 * @param string $pass
+	 */
+	public function __construct( $user, $pass )
 	{
+		// Start the session.
+		if ( !isset( $_SESSION ) ) session_start();
 
-		/* Start the session. */
-		if (!isset($_SESSION)) session_start();
-
-		/* Preform authentication */
-		$this->getLoginAuth($user, $pass);
-
+		// Preform authentication
+		$this->get_login_auth( $user, $pass );
 	}
 
-	private function getPage($url, $params = array())
+
+	/**
+	 * Retrieve a page using CURL.
+	 *
+	 * @param string $url
+	 * @param array $params (optional)
+	 * @return string
+	 */
+	private function get_page( $url, $params = array() )
 	{
+		$login_auth = !empty( $_SESSION['Geczy']['login_auth'] ) ? $_SESSION['Geczy']['login_auth'] : '';
 
-		$login_auth = !empty($_SESSION['Geczy']['login_auth']) ? $_SESSION['Geczy']['login_auth'] : '';
+		$ch = curl_init( $url );
+		curl_setopt( $ch, CURLOPT_HEADER, false );
+		curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch, CURLOPT_HTTPHEADER, array( "Authorization: GoogleLogin {$login_auth}", 'User-Agent: Mozilla/5.0' ) );
 
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: GoogleLogin {$login_auth}", 'User-Agent: Mozilla/5.0'));
-
-		if(!empty($params)){
-			curl_setopt($ch, CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+		if ( !empty( $params ) ) {
+			curl_setopt( $ch, CURLOPT_POST, true );
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, http_build_query( $params ) );
 		}
 
-		$response = curl_exec($ch);
-		curl_close($ch);
+		$response = curl_exec( $ch );
+		curl_close( $ch );
 
 		return $response;
-
 	}
 
-	private function getLoginAuth($user, $pass)
+
+	/**
+	 * Authenticate the Google Voice account and save the session.
+	 *
+	 * @param string $user
+	 * @param string $pass
+	 * @return unknown
+	 */
+	private function get_login_auth( $user, $pass )
 	{
-		if (!empty($_SESSION['Geczy']['login_auth']))
+		if ( !empty( $_SESSION['Geczy']['login_auth'] ) )
 			return false;
 
 		$params = array(
-			'accountType'=> 'GOOGLE',
-			'Email'      => $user,
-			'Passwd'     => $pass,
-			'service'    => 'grandcentral',
-			'source'     => 'Geczy-Google-Voice-Library',
+			'accountType' => 'GOOGLE',
+			'Email'       => $user,
+			'Passwd'      => $pass,
+			'service'     => 'grandcentral',
+			'source'      => 'Geczy-Google-Voice-Library',
 		);
 
-		$results = $this->getPage($this->urls['login'], $params);
-		$auth = strstr(trim($results), 'Auth=');
+		$results = $this->get_page( $this->urls['login'], $params );
+		$auth = strstr( trim( $results ), 'Auth=' );
 
 		$_SESSION['Geczy']['login_auth'] = $auth;
-
 	}
 
-	public function getRnrSe()
-	{
 
-		if (!empty($_SESSION['Geczy']['rnr_se']))
+	/**
+	 * String some Google Voice requests require.
+	 *
+	 * @return string
+	 */
+	public function get_rnrse()
+	{
+		if ( !empty( $_SESSION['Geczy']['rnr_se'] ) )
 			return $_SESSION['Geczy']['rnr_se'];
 
-		$result = $this->getPage($this->urls['get']);
-		$result = json_decode($result);
+		$result = $this->get_page( $this->urls['get'] );
+		$result = json_decode( $result );
 
 		$_SESSION['Geczy']['rnr_se'] = $result->r;
 
 		return $result->r;
-
 	}
 
-	public function delete($id)
+
+	/**
+	 * Delete a message.
+	 *
+	 * @param string $id
+	 */
+	public function delete( $id )
 	{
-
-		$params = array(
-			'messages'=> $id,
-			'trash'   => 1,
-			'_rnr_se' => $this->getRnrSe(),
-		);
-
-		$this->getPage($this->urls['delete'], $params);
-
-	}
-
-	public function archive($id)
-	{
-
 		$params = array(
 			'messages' => $id,
-			'archive' => 1,
-			'_rnr_se' => $this->getRnrSe(),
+			'trash'    => 1,
+			'_rnr_se'  => $this->get_rnrse(),
 		);
 
-		$this->getPage($this->urls['archive'], $params);
-
+		$this->get_page( $this->urls['delete'], $params );
 	}
 
-	public function markRead($id)
-	{
 
+	/**
+	 * Archive a message.
+	 *
+	 * @param string $id
+	 */
+	public function archive( $id )
+	{
 		$params = array(
 			'messages' => $id,
-			'read' => 1,
-			'_rnr_se' => $this->getRnrSe(),
+			'archive'  => 1,
+			'_rnr_se'  => $this->get_rnrse(),
 		);
 
-		$this->getPage($this->urls['markRead'], $params);
-
+		$this->get_page( $this->urls['archive'], $params );
 	}
 
-	public function sendText($to, $msg, $id = '')
-	{
 
+	/**
+	 * Mark a message as read.
+	 *
+	 * @param string $id
+	 */
+	public function mark_read( $id )
+	{
+		$params = array(
+			'messages' => $id,
+			'read'     => 1,
+			'_rnr_se'  => $this->get_rnrse(),
+		);
+
+		$this->get_page( $this->urls['mark_read'], $params );
+	}
+
+
+	/**
+	 * Send a text to a number.
+	 *
+	 * @param string $to
+	 * @param string $msg
+	 * @param string $id  (optional)
+	 */
+	public function send_text( $to, $msg, $id = '' )
+	{
 		$params = array(
 			'conversationId' => $id,
-			'phoneNumber'=> $to,
-			'text'       => $msg,
-			'_rnr_se'    => $this->getRnrSe(),
+			'phoneNumber'    => $to,
+			'text'           => $msg,
+			'_rnr_se'        => $this->get_rnrse(),
 		);
 
-		$this->getPage($this->urls['send'], $params);
-
+		$this->get_page( $this->urls['send'], $params );
 	}
 
-	public function getInbox($params = array())
-	{
 
+	/**
+	 * Retrieve the current inbox.
+	 *
+	 * @param array $params (optional)
+	 * @return array
+	 */
+	public function get_inbox( $params = array() )
+	{
 		$defaults = array(
-			'history'=> false,
-			'onlyNew'=> true,
-			'page'   => 1,
+			'history' => false,
+			'onlyNew' => true,
+			'page'    => 1,
 		);
 
-		$params = array_merge($defaults, $params);
+		$params = array_merge( $defaults, $params );
 
-		$json = $this->getPage($this->urls['get'].'?page='.$params['page']);
-		$data = json_decode($json);
-		$results = $this->parseTexts($data, $params);
+		$json = $this->get_page( $this->urls['get'].'?page='.$params['page'] );
+		$data = json_decode( $json );
+		$results = $this->parse_texts( $data, $params );
 
 		return $results;
-
 	}
 
-	private function parseTexts($data, $params)
-	{
 
+	/**
+	 * Helper for formatting the inbox.
+	 *
+	 * @param object $data
+	 * @param array $params
+	 * @return array
+	 */
+	private function parse_texts( $data, $params )
+	{
 		$contacts = $data->contacts->contactPhoneMap;
 
 		$results = array(
@@ -180,38 +233,35 @@ class GoogleVoiceLibrary
 			'total'  => $data->totalSize,
 		);
 
-		foreach($data->messageList as $thread)
-		{
+		foreach ( $data->messageList as $thread ) {
 
 			/* This message is already read, so skip */
-			if($params['onlyNew'] && $thread->isRead)
+			if ( $params['onlyNew'] && $thread->isRead )
 				continue;
 
 			/* Extract just the information that's useful. */
 			$number = $thread->phoneNumber;
 			$results['texts'][$thread->id] = array(
-				'from'  => $contacts->$number->name,
-				'number'=> $thread->displayNumber,
-				'date'  => $thread->displayStartDateTime,
-				'text' => $thread->children[count($thread->children)-1]->message,
+				'from'   => $contacts->$number->name,
+				'number' => $thread->displayNumber,
+				'date'   => $thread->displayStartDateTime,
+				'text'   => $thread->children[count( $thread->children )-1]->message,
 			);
 
-			if ($params['history'])
-			{
-				foreach($thread->children as $child)
-				{
+			if ( $params['history'] ) {
+				foreach ( $thread->children as $child ) {
 					$results['texts'][$thread->id]['history'][] = array(
-						'from' => $child->type == 11 ? 'Me' : $results['texts'][$thread->id]['from'],
-						'time' => $child->displayStartDateTime,
+						'from'    => $child->type == 11 ? 'Me' : $results['texts'][$thread->id]['from'],
+						'time'    => $child->displayStartDateTime,
 						'message' => $child->message,
 					);
 				}
 			}
 
-		 }
+		}
 
-		 return $results;
-
+		return $results;
 	}
+
 
 }

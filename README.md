@@ -13,7 +13,7 @@ Clone the repo, `git clone git://github.com/Geczy/google-voice-library.git`, or 
 include_once('class.googlevoice.php');
 
 $googleVoice = new \Geczy\Voice\GoogleVoiceLibrary('username', 'password');
-$messages = $googleVoice->getInbox();
+$messages = $googleVoice->get_inbox();
 
 var_dump($messages);
 ```
@@ -26,19 +26,19 @@ Features
 ```php
 <?php
 $params = array(
-	'history' => true, /* All messages in a conversation? */
-	'onlyNew' => false, /* Just unread messages? */
-	'page' => 1, /* Page of inbox to retrieve? */
+	'history' => true,   // All messages in a conversation?
+	'onlyNew' => false,  // Just unread messages?
+	'page'    => 1,      // Page of inbox to retrieve?
 );
 
-$messages = $googleVoice->getInbox($params);
+$messages = $googleVoice->get_inbox($params);
 ```
 
 ### Send a text
 
 ```php
 <?php
-$googleVoice->sendText(8002029393, 'Hello, world!');
+$googleVoice->send_text(8002029393, 'Hello, world!');
 ```
 
 ### Archive a conversation
@@ -59,7 +59,7 @@ $googleVoice->delete('message_id');
 
 ```php
 <?php
-$googleVoice->markRead('message_id');
+$googleVoice->mark_read('message_id');
 ```
 
 Example inbox response
