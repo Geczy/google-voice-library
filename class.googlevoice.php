@@ -22,6 +22,13 @@ namespace Geczy\Voice;
 class GoogleVoiceLibrary
 {
 
+	/**
+	 * API request URLs to Google Voice.
+	 *
+	 * @var array
+	 *
+	 * @access private
+	 */
 	private $urls = array(
 		'login'     => 'https://www.google.com/accounts/ClientLogin',
 		'get'       => 'https://www.google.com/voice/b/0/request/messages/',
@@ -30,12 +37,11 @@ class GoogleVoiceLibrary
 		'archive'   => 'https://www.google.com/voice/b/0/inbox/archiveMessages/',
 		'delete'    => 'https://www.google.com/voice/b/0/inbox/deleteMessages/',
 	);
-
 	/**
 	 * Username and password to the Google Voice account.
 	 *
-	 * @param string $user
-	 * @param string $pass
+	 * @param string  $user
+	 * @param string  $pass
 	 */
 	public function __construct( $user, $pass )
 	{
@@ -50,8 +56,8 @@ class GoogleVoiceLibrary
 	/**
 	 * Retrieve a page using CURL.
 	 *
-	 * @param string $url
-	 * @param array $params (optional)
+	 * @param string  $url
+	 * @param array   $params (optional)
 	 * @return string
 	 */
 	private function get_page( $url, $params = array() )
@@ -79,8 +85,8 @@ class GoogleVoiceLibrary
 	/**
 	 * Authenticate the Google Voice account and save the session.
 	 *
-	 * @param string $user
-	 * @param string $pass
+	 * @param string  $user
+	 * @param string  $pass
 	 * @return unknown
 	 */
 	private function get_login_auth( $user, $pass )
@@ -125,7 +131,7 @@ class GoogleVoiceLibrary
 	/**
 	 * Delete a message.
 	 *
-	 * @param string $id
+	 * @param string  $id
 	 */
 	public function delete( $id )
 	{
@@ -142,7 +148,7 @@ class GoogleVoiceLibrary
 	/**
 	 * Archive a message.
 	 *
-	 * @param string $id
+	 * @param string  $id
 	 */
 	public function archive( $id )
 	{
@@ -159,7 +165,7 @@ class GoogleVoiceLibrary
 	/**
 	 * Mark a message as read.
 	 *
-	 * @param string $id
+	 * @param string  $id
 	 */
 	public function mark_read( $id )
 	{
@@ -176,9 +182,9 @@ class GoogleVoiceLibrary
 	/**
 	 * Send a text to a number.
 	 *
-	 * @param string $to
-	 * @param string $msg
-	 * @param string $id  (optional)
+	 * @param string  $to
+	 * @param string  $msg
+	 * @param string  $id  (optional)
 	 */
 	public function send_text( $to, $msg, $id = '' )
 	{
@@ -196,7 +202,7 @@ class GoogleVoiceLibrary
 	/**
 	 * Retrieve the current inbox.
 	 *
-	 * @param array $params (optional)
+	 * @param array   $params (optional)
 	 * @return array
 	 */
 	public function get_inbox( $params = array() )
@@ -220,8 +226,8 @@ class GoogleVoiceLibrary
 	/**
 	 * Helper for formatting the inbox.
 	 *
-	 * @param object $data
-	 * @param array $params
+	 * @param object  $data
+	 * @param array   $params
 	 * @return array
 	 */
 	private function parse_texts( $data, $params )
