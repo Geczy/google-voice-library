@@ -165,10 +165,11 @@ class GoogleVoiceLibrary
 	 * @param string  $query
 	 * @return object
 	 */
-	public function search( $query )
+	public function search( $query, $page = 1 )
 	{
 		$params = array(
-			'q' => $query,
+			'q'    => $query,
+			'page' => 'p' . $page,
 		);
 
 		$result = $this->get_page( $this->urls['search'], $params, false );
