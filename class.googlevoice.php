@@ -30,9 +30,15 @@ class GoogleVoiceLibrary
 	 * @access private
 	 */
 	private $urls = array(
-		'login'     => 'https://www.google.com/accounts/ClientLogin',
-		'get'       => 'https://www.google.com/voice/b/0/request/messages/',
-		'send'      => 'https://www.google.com/voice/b/0/sms/send/',
+		// Authenticate
+		'login' => 'https://www.google.com/accounts/ClientLogin',
+
+		// Requests
+		'search' => 'https://www.google.com/voice/b/0/inbox/search/',
+		'get'    => 'https://www.google.com/voice/b/0/request/messages/',
+		'send'   => 'https://www.google.com/voice/b/0/sms/send/',
+
+		// Actions
 		'mark_read' => 'https://www.google.com/voice/b/0/inbox/mark/',
 		'archive'   => 'https://www.google.com/voice/b/0/inbox/archiveMessages/',
 		'delete'    => 'https://www.google.com/voice/b/0/inbox/deleteMessages/',
@@ -59,11 +65,16 @@ class GoogleVoiceLibrary
 	 *
 	 * @param string  $url
 	 * @param array   $params (optional)
+	 * @param unknown $post   (optional)
 	 * @return string
 	 */
-	private function get_page( $url, $params = array() )
+	private function get_page( $url, $params = array(), $post = true )
 	{
 		$login_auth = $this->auth ? $this->auth : '';
+
+		// GET request rather than POST
+		if ( !$post )
+			$url = $url . '?' . http_build_query( $params );
 
 		$ch = curl_init( $url );
 		curl_setopt( $ch, CURLOPT_HEADER, false );
@@ -71,7 +82,7 @@ class GoogleVoiceLibrary
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_HTTPHEADER, array( "Authorization: GoogleLogin {$login_auth}", 'User-Agent: Mozilla/5.0' ) );
 
-		if ( !empty( $params ) ) {
+		if ( $params && $post ) {
 			curl_setopt( $ch, CURLOPT_POST, true );
 			curl_setopt( $ch, CURLOPT_POSTFIELDS, http_build_query( $params ) );
 		}
@@ -149,9 +160,29 @@ class GoogleVoiceLibrary
 
 
 	/**
+	 * Search for a message.
+	 *
+	 * @param string  $query
+	 * @return object
+	 */
+	public function search( $query )
+	{
+		$params = array(
+			'q' => $query,
+		);
+
+		$result = $this->get_page( $this->urls['search'], $params, false );
+		$json = simplexml_load_string( $result );
+
+		return json_decode( (string) $json->json );
+	}
+
+
+	/**
 	 * Delete a message.
 	 *
 	 * @param string  $id
+	 * @return object
 	 */
 	public function delete( $id )
 	{
@@ -169,6 +200,7 @@ class GoogleVoiceLibrary
 	 * Archive a message.
 	 *
 	 * @param string  $id
+	 * @return object
 	 */
 	public function archive( $id )
 	{
@@ -186,6 +218,7 @@ class GoogleVoiceLibrary
 	 * Mark a message as read.
 	 *
 	 * @param string  $id
+	 * @return object
 	 */
 	public function mark_read( $id )
 	{
@@ -205,6 +238,7 @@ class GoogleVoiceLibrary
 	 * @param string  $to
 	 * @param string  $msg
 	 * @param string  $id  (optional)
+	 * @return object
 	 */
 	public function send_text( $to, $msg, $id = '' )
 	{
