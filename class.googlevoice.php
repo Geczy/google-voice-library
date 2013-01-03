@@ -37,6 +37,7 @@ class GoogleVoiceLibrary
 		'archive'   => 'https://www.google.com/voice/b/0/inbox/archiveMessages/',
 		'delete'    => 'https://www.google.com/voice/b/0/inbox/deleteMessages/',
 	);
+
 	/**
 	 * Username and password to the Google Voice account.
 	 *
@@ -49,7 +50,7 @@ class GoogleVoiceLibrary
 		if ( !isset( $_SESSION ) ) session_start();
 
 		// Preform authentication
-		$this->get_login_auth( $user, $pass );
+		$this->set_login_auth( $user, $pass );
 	}
 
 
@@ -62,7 +63,7 @@ class GoogleVoiceLibrary
 	 */
 	private function get_page( $url, $params = array() )
 	{
-		$login_auth = !empty( $_SESSION['Geczy']['login_auth'] ) ? $_SESSION['Geczy']['login_auth'] : '';
+		$login_auth = $this->auth ? $this->auth : '';
 
 		$ch = curl_init( $url );
 		curl_setopt( $ch, CURLOPT_HEADER, false );
@@ -83,16 +84,17 @@ class GoogleVoiceLibrary
 
 
 	/**
-	 * Authenticate the Google Voice account and save the session.
+	 * Authenticate the Google Voice account.
 	 *
 	 * @param string  $user
 	 * @param string  $pass
-	 * @return unknown
+	 * @return string
 	 */
 	private function get_login_auth( $user, $pass )
 	{
+		// Auth has already been set.
 		if ( !empty( $_SESSION['Geczy']['login_auth'] ) )
-			return false;
+			return $_SESSION['Geczy']['login_auth'];
 
 		$params = array(
 			'accountType' => 'GOOGLE',
@@ -103,9 +105,29 @@ class GoogleVoiceLibrary
 		);
 
 		$results = $this->get_page( $this->urls['login'], $params );
-		$auth = strstr( trim( $results ), 'Auth=' );
+		$auth = $results ? strstr( trim( $results ), 'Auth=' ) : false;
 
-		$_SESSION['Geczy']['login_auth'] = $auth;
+		return $auth;
+	}
+
+
+	/**
+	 * Set the authentication token to a session.
+	 *
+	 * @param string  $user
+	 * @param string  $pass
+	 * @return string
+	 */
+	private function set_login_auth( $user, $pass )
+	{
+		$auth = $this->get_login_auth( $user, $pass );
+
+		if ( $auth ) {
+			$_SESSION['Geczy']['login_auth'] = $auth;
+			$this->auth = $auth;
+		}
+
+		return $auth;
 	}
 
 
