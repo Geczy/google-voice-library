@@ -70,7 +70,7 @@ class GoogleVoiceLibrary
 	 */
 	private function get_page( $url, $params = array(), $post = true )
 	{
-		$login_auth = $this->auth ? $this->auth : '';
+		$login_auth = (empty($this->auth)) ? '' : $this->auth;
 
 		// GET request rather than POST
 		if ( !$post )
